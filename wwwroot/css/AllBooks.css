@@ -1,0 +1,158 @@
+﻿/* General Styles */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f7fb;
+    margin: 0;
+    padding: 0px;
+}
+
+.container {
+    margin: 0;
+    padding: 0px;
+}
+/* Header */
+h2 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+/* Search and On Sale Toggle */
+.d-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#searchBar {
+    width: 75%;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    padding: 10px;
+}
+
+/* Filters Section */
+.filters {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 320px;
+    margin-top: 20px;
+}
+
+    .filters h5 {
+        margin-bottom: 20px;
+        font-size: 1.25rem;
+        color: #444;
+    }
+
+/* Book Cards */
+.book-card {
+    max-height: 580px;
+    min-height: 500px;
+    border: none;
+    border-radius: 15px;
+    background-color: #fff;
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+    .book-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+.card-body {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-img-top {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    border-bottom: 1px solid #eee;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.card-text {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.price-section {
+    margin-top: auto;
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.discounted-price {
+    font-size: 1.25rem;
+    color: #f44336;
+    font-weight: bold;
+}
+
+
+/* Buttons */
+.add-to-cart,
+.bookmark {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+}
+
+.add-to-cart {
+    border: 1px solid #007bff;
+    color: #007bff;
+}
+
+.edit {
+    border: 1px solid #007bff;
+    color: #007bff;
+    padding: 15px 28px;
+}
+
+.bookmark {
+    border: 1px solid #6c757d;
+    color: #6c757d;
+}
+
+/* Filter Section - Toggle Button */
+button {
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    font-weight: 600;
+}
+
+.sale-ribbon {
+    position: absolute;
+    top: 10px;
+    right: -30px;
+    background: red;
+    color: white;
+    padding: 5px 40px;
+    transform: rotate(45deg);
+    font-weight: bold;
+    z-index: 10;
+    font-size: 14px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}

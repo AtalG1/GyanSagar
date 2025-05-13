@@ -1,0 +1,92 @@
+﻿:root {
+    --primary-color: #b02a37;
+    --bg-color: #f9f9f9;
+    --text-color: #333;
+    --star-color: #ccc;
+    --star-selected: #ffcc00;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 40px;
+}
+
+.review-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    color: var(--primary-color);
+}
+
+.book-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+    .book-info img {
+        width: 100px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 6px;
+        margin-right: 20px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+label {
+    font-weight: 600;
+    display: block;
+    margin-top: 20px;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-top: 8px;
+    resize: vertical;
+    font-size: 1rem;
+}
+
+button {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 25px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    button:hover {
+        background-color: #9a1f2f;
+    }
+
+.stars {
+    font-size: 2rem;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.star {
+    color: var(--star-color);
+    margin-right: 5px;
+    transition: color 0.2s;
+}
+
+    .star.selected {
+        color: var(--star-selected);
+    }

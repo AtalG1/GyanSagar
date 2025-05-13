@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Manage Orders</title>
+    <link rel="stylesheet" href="/css/Order.css">
+    <div id="navbar-container"></div>
+    <script>
+
+        fetch('NavbarAdmin.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+
+                // Handle logout after loading navbar
+                document.getElementById('logoutBtn')?.addEventListener('click', e => {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to logout?')) {
+                        localStorage.clear();
+                        window.location.href = 'login.html';
+                    }
+                });
+            });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('role');
+
+            // Redirect to login if not authenticated or not admin/staff
+            if (!token || !(role === 'admin' || role === 'staff')) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Pending Orders</h1>
+
+    <!-- Success message container -->
+    <div id="success-message" style="display:none; color: green; font-weight: bold; padding: 10px;"></div>
+
+    <div class="order-container">
+        <table id="adminOrdersTable">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <th>Total</th>
+                    <th>Discount</th>
+                    <th>Final</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Fetch the pending orders from the API
+        fetch(`https://localhost:7003/api/Order/pending-orders`)
+            .then(res => res.json())
+            .then(orders => {
+                const tbody = document.querySelector('#adminOrdersTable tbody');
+                orders.forEach(order => {
+                    const row = document.createElement('tr');
+
+                    // Add functionality to the row to navigate to order details
+                    row.style.cursor = "pointer";
+                    row.onclick = (event) => {
+                        if (event.target.tagName !== 'BUTTON') { // Prevent navigation on button click
+                            window.location.href = `/OrderDetailsAdmin.html?orderId=${order.orderID}`;
+                        }
+                    };
+
+                    row.innerHTML = `
+                        <td>${order.orderID}</td>
+                        <td>${new Date(order.orderDate).toLocaleDateString()}</td>
+                        <td>₹${order.totalAmount.toFixed(2)}</td>
+                        <td>₹${order.discountAmount.toFixed(2)}</td>
+                        <td>₹${order.finalAmount.toFixed(2)}</td>
+                        <td>${order.status}</td>
+                        <td>
+                            <button class="btn btn-success" onclick="markSuccessful(${order.orderID}, event)">Mark Successful</button>
+                            <button class="btn btn-danger" onclick="cancelOrder(${order.orderID}, event)">Cancel</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(err => {
+                console.error('Failed to load orders', err);
+                alert('Could not load orders.');
+            });
+
+        // Mark order as successful
+function markSuccessful(orderId, event) {
+    event.stopPropagation(); // Prevent row redirection
+
+    const code = prompt("Enter verification code to mark as successful:");
+    if (!code) return;
+
+    fetch(`https://localhost:7003/api/Order/verify/${orderId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(code)
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Failed to verify');
+        return res.text();
+    })
+    .then(msg => {
+        // Show success message
+        const successMessage = document.getElementById('success-message');
+        successMessage.textContent = msg;
+        successMessage.style.display = 'block'; 
+        setTimeout(() => {
+            // Hide success message after 5 seconds
+            successMessage.style.display = 'none';
+        }, 5000); // Hide after 5 seconds
+
+        // Reload the page after displaying the message
+        setTimeout(() => {
+            location.reload();  
+        }, 1000);  
+    })
+    .catch(err => {
+        alert("Verification failed. Make sure the code is correct.");
+        console.error(err);
+    });
+}
+
+
+        // Cancel an order
+        function cancelOrder(orderId, event) {
+            event.stopPropagation(); // Prevent row redirection
+
+            if (!confirm("Are you sure you want to cancel this order?")) return;
+
+            fetch(`https://localhost:7003/api/Order/cancel/${orderId}`, {
+                method: 'POST'
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to cancel');
+                return res.text();
+            })
+            .then(msg => {
+                // Show success message
+                document.getElementById('success-message').textContent = msg;
+                document.getElementById('success-message').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('success-message').style.display = 'none';
+                }, 5000); // Hide the success message after 5 seconds
+                location.reload();
+            })
+            .catch(err => {
+                alert("Could not cancel the order.");
+                console.error(err);
+            });
+        }
+    </script>
+</body>
+</html>

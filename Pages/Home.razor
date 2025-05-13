@@ -1,0 +1,150 @@
+﻿@page "/books"
+
+@using System.Linq
+@inject HttpClient Http
+
+<h3>Book Catalog</h3>
+
+<!-- Search Bar -->
+<div class="search-bar">
+    <input type="text" @bind="searchQuery" placeholder="Search for books..." @oninput="FilterBooks" />
+</div>
+
+<div class="filters">
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <h4>Filters</h4>
+
+        <!-- Genre Filter -->
+        <label for="genre">Genre</label>
+        <select id="genre" @bind="selectedGenre" @onchange="FilterBooks">
+            <option value="">All</option>
+            <option value="Fiction">Fiction</option>
+            <option value="Non-Fiction">Non-Fiction</option>
+            <option value="Sci-Fi">Sci-Fi</option>
+            <option value="Fantasy">Fantasy</option>
+        </select>
+
+        <!-- Price Range Filter -->
+        <label for="minPrice">Min Price</label>
+        <input type="number" id="minPrice" @bind="minPrice" @oninput="FilterBooks" placeholder="₹" />
+
+        <label for="maxPrice">Max Price</label>
+        <input type="number" id="maxPrice" @bind="maxPrice" @oninput="FilterBooks" placeholder="₹" />
+
+        <!-- Sale Only Checkbox -->
+        <label>
+            <input type="checkbox" @bind="onlyOnSale" @onchange="FilterBooks" /> On Sale Only
+        </label>
+
+        <!-- Sort By Dropdown -->
+        <label for="sortBy">Sort By</label>
+        <select id="sortBy" @bind="sortBy" @onchange="FilterBooks">
+            <option value="">Select</option>
+            <option value="priceLow">Price: Low to High</option>
+            <option value="priceHigh">Price: High to Low</option>
+            <option value="rating">Highest Rating</option>
+        </select>
+    </div>
+</div>
+
+<!-- Books Display Section -->
+<div class="book-container">
+    @foreach (var book in filteredBooks)
+    {
+        <div class="book-card">
+            <img src="@book.ImagePath" alt="@book.Title" class="book-image" />
+            <div class="book-info">
+                <h5>@book.Title</h5>
+                <p><strong>Author:</strong> @book.Author</p>
+                <p><strong>Price:</strong> ₹@book.Price</p>
+                @if (book.IsOnSale)
+                {
+                    <span class="sale-badge">@book.SaleDiscount% OFF</span>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<Book> books = new List<Book>();
+    private List<Book> filteredBooks = new List<Book>();
+    private string searchQuery = "";
+    private string selectedGenre = "";
+    private decimal minPrice = 0;
+    private decimal maxPrice = 10000;
+    private bool onlyOnSale = false;
+    private string sortBy = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Sample data fetching, replace with your actual API call
+        books = await Http.GetFromJsonAsync<List<Book>>("https://localhost:7003/api/Books/all-details");
+        filteredBooks = books;
+    }
+
+    private void FilterBooks()
+    {
+        var query = books.AsEnumerable();
+
+        // Search Filter
+        if (!string.IsNullOrEmpty(searchQuery))
+        {
+            query = query.Where(b => b.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+        }
+
+        // Genre Filter
+        if (!string.IsNullOrEmpty(selectedGenre))
+        {
+            query = query.Where(b => b.Genre == selectedGenre);
+        }
+
+        // Price Filters
+        if (minPrice > 0)
+        {
+            query = query.Where(b => b.Price >= minPrice);
+        }
+        if (maxPrice < 10000)
+        {
+            query = query.Where(b => b.Price <= maxPrice);
+        }
+
+        // Sale Only Filter
+        if (onlyOnSale)
+        {
+            query = query.Where(b => b.IsOnSale);
+        }
+
+        // Sorting Logic
+        switch (sortBy)
+        {
+            case "priceLow":
+                query = query.OrderBy(b => b.Price);
+                break;
+            case "priceHigh":
+                query = query.OrderByDescending(b => b.Price);
+                break;
+            case "rating":
+                query = query.OrderByDescending(b => b.Rating);
+                break;
+            default:
+                break;
+        }
+
+        filteredBooks = query.ToList();
+    }
+
+    public class Book
+    {
+        public int BookID { get; set; }
+        public string Title { get; set; }
+        public string Author { get; set; }
+        public string Genre { get; set; }
+        public decimal Price { get; set; }
+        public string ImagePath { get; set; }
+        public bool IsOnSale { get; set; }
+        public int SaleDiscount { get; set; }
+        public float Rating { get; set; }
+    }
+}

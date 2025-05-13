@@ -1,0 +1,37 @@
+﻿/* EditBook.css */
+
+body {
+    background-color: #f8f9fa;
+}
+
+.form-section {
+    max-width: 900px;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.readonly-field {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+#bookImagePreview {
+    max-height: 250px;
+    border: 1px solid #ccc;
+    padding: 5px;
+    background: #f8f9fa;
+    width: 100%;
+    object-fit: contain;
+}
+
+label .fas {
+    font-size: 1rem;
+    vertical-align: middle;
+}
+
+.stat-value {
+    font-weight: 600;
+    font-size: 1.1rem;
+}

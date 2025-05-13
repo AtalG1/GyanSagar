@@ -1,0 +1,6 @@
+@GyanSagarNew_HostAddress = http://localhost:5222
+
+GET {{GyanSagarNew_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

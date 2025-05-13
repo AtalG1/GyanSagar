@@ -1,0 +1,249 @@
+﻿/* General Body Styling */
+body {
+    font-family: 'Helvetica Neue', sans-serif;
+    background-color: #f1f1f1;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* Book Container */
+.container.book-container {
+    margin-top: 30px;
+    background: linear-gradient(135deg, #ffffff, #f3f3f3);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    overflow: hidden;
+}
+
+/* Row - Center the Content */
+.book-container .row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Book Image Styling */
+.book-img {
+    max-width: 90%;
+    border-radius: 15px;
+    transition: transform 0.3s ease-in-out;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+    /* Add Hover Effect to Image */
+    .book-img:hover {
+        transform: scale(1.05);
+    }
+
+/* Book Details Section */
+.book-details {
+    padding-left: 30px;
+    text-align: left;
+    color: #333;
+}
+
+/* Title Styling */
+#bookTitle {
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+/* Author Styling */
+#bookAuthor {
+    font-size: 1.2rem;
+    color: #7f8c8d;
+    margin-bottom: 20px;
+}
+
+/* General Text Styling */
+p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+strong {
+    color: #2c3e50;
+}
+
+/* Rating Stars Section */
+.rating-stars {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+    .rating-stars i {
+        color: #f39c12;
+        font-size: 1.3rem;
+    }
+
+/* Price Section */
+.mb-3 {
+    margin-bottom: 25px;
+}
+
+/* Original Price Styling */
+.price-original {
+    font-size: 1.6rem;
+    text-decoration: line-through;
+    color: #7f8c8d;
+}
+
+/* Final Price Styling */
+.text-success {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #27ae60;
+}
+
+/* Sale Badge */
+.sale-badge {
+    background-color: #e74c3c;
+    color: white;
+    padding: 7px 15px;
+    border-radius: 25px;
+    font-weight: 700;
+    display: inline-block;
+    margin-left: 15px;
+}
+
+    /* Add some space below the sale badge */
+    .sale-badge.d-none {
+        display: none;
+    }
+
+/* Button Styling */
+.btn {
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    border-radius: 30px;
+    transition: background-color 0.3s, transform 0.2s ease-in-out;
+}
+
+/* Add to Cart Button */
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 6px rgba(52, 152, 219, 0.2);
+}
+
+    /* Hover effect on Add to Cart */
+    .btn-primary:hover {
+        background-color: #2980b9;
+        transform: translateY(-3px);
+    }
+
+/* Bookmark Button */
+.btn-outline-secondary {
+    border: 2px solid #7f8c8d;
+    color: #7f8c8d;
+    background-color: transparent;
+    font-weight: 600;
+}
+
+    /* Hover effect on Bookmark Button */
+    .btn-outline-secondary:hover {
+        background-color: #7f8c8d;
+        color: white;
+        transform: translateY(-3px);
+    }
+
+/* Button Icon */
+#addToCart i,
+#bookmarkBtn i {
+    margin-right: 8px;
+}
+
+/* Responsive Design for Small Screens */
+@media (max-width: 768px) {
+    .book-container .row {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .book-img {
+        max-width: 80%;
+        margin-bottom: 20px;
+    }
+
+    .book-details {
+        padding-left: 0;
+        padding-top: 20px;
+    }
+
+        .book-details p {
+            text-align: center;
+        }
+}
+
+@media (max-width: 576px) {
+    #bookTitle {
+        font-size: 2.2rem;
+    }
+
+    .book-details {
+        padding-left: 15px;
+    }
+
+    .rating-stars i {
+        font-size: 1.5rem;
+    }
+
+    .price-original,
+    .text-success {
+        font-size: 1.3rem;
+    }
+}
+
+
+/* Review Section */
+.reviews-section {
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 2px solid #e0e0e0;
+}
+
+    .reviews-section h3 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 25px;
+    }
+
+/* Individual Review Block */
+.review {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease-in-out;
+}
+
+    .review:hover {
+        transform: translateY(-3px);
+    }
+
+    /* Review Text Styling */
+    .review p {
+        font-size: 1.05rem;
+        color: #444;
+        margin-bottom: 8px;
+    }
+
+    .review strong {
+        color: #2980b9;
+    }
+
+/* Star Rating in Review */
+.review-rating {
+    color: #f39c12;
+    font-weight: bold;
+}

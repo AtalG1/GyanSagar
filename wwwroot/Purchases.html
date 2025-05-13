@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Purchased Books</title>
+    <link rel="stylesheet" href="/css/purchases.css">
+    <div id="navbar-container"></div>
+    <script>
+
+        fetch('Navbar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+
+                // Handle logout after loading navbar
+                document.getElementById('logoutBtn')?.addEventListener('click', e => {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to logout?')) {
+                        localStorage.clear();
+                        window.location.href = 'login.html';
+                    }
+                });
+            });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('role');
+
+            // Redirect to login if not authenticated or not admin/staff
+            if (!token || !(role === 'user')) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+
+</head>
+<body>
+    <h2>My Purchased Books</h2>
+    <div id="book-list" class="book-list"></div>
+
+    <script>
+        const userId = localStorage.getItem('userId'); // Replace with actual logged-in user's ID
+
+        fetch(`https://localhost:7003/api/Review/purchased/${userId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(books => {
+                const container = document.getElementById('book-list');
+                if (books.length === 0) {
+                    container.innerHTML = "<p>No purchases found.</p>";
+                    return;
+                }
+
+                books.forEach(book => {
+                    const card = document.createElement('div');
+                    card.className = "book-card";
+                    card.innerHTML = `
+                <img src="${book.imagePath}" alt="${book.title}" />
+                <h3>${book.title}</h3>
+                <p>${book.author}</p>
+                <button onclick="window.location.href='/review.html?bookId=${book.bookID}'">Rate & Review</button>
+            `;
+                    container.appendChild(card);
+                });
+            })
+            .catch(err => {
+                console.error("Error fetching books:", err);
+                document.getElementById('book-list').innerHTML = "<p>Error loading purchases.</p>";
+            });
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+﻿/* Base Styles */
+body {
+    background-color: #f4f6f8;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+/* Table styling */
+table {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Table Header */
+.table thead th {
+    background-color: #0d6efd;
+    color: #fff;
+    vertical-align: middle;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+}
+
+/* Table Rows */
+.table tbody tr {
+    transition: background-color 0.2s ease, transform 0.3s ease;
+}
+
+    .table tbody tr:hover {
+        background-color: #f1f1f1;
+        transform: scale(1.02);
+    }
+
+/* Collapse Section */
+.collapse-row td {
+    padding: 0;
+    background-color: #f9fbfc;
+    border-top: none;
+}
+
+/* Collapsible content */
+.collapse .p-3 {
+    background-color: #eef3f7;
+    border-top: 2px solid #0d6efd;
+    border-bottom: 2px solid #0d6efd;
+    border-radius: 0 0 6px 6px;
+    font-size: 1rem;
+}
+
+.collapse strong {
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+/* Inner Book Table */
+.collapse .table {
+    background-color: #fff;
+    margin-bottom: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+}
+
+    .collapse .table th {
+        background-color: #f2f6fa;
+        font-size: 1rem;
+        text-transform: uppercase;
+        color: #444;
+        border-bottom: 2px solid #ddd;
+        padding: 12px 15px;
+    }
+
+    .collapse .table td {
+        font-size: 0.95rem;
+        padding: 10px 15px;
+        color: #555;
+        border-bottom: 1px solid #ddd;
+    }
+
+    /* Hover Effect for Inner Table */
+    .collapse .table tbody tr:hover {
+        background-color: #f9fafb;
+    }
+
+    .collapse .table td:last-child {
+        border-bottom: none;
+    }
+
+/* Buttons */
+.btn-outline-primary {
+    font-weight: 500;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+    .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+/* Responsive padding */
+@media (max-width: 768px) {
+    .collapse .p-3 {
+        font-size: 0.95rem;
+    }
+
+    .btn-outline-primary {
+        width: 100%;
+        margin-top: 5px;
+    }
+
+    .collapse .table th, .collapse .table td {
+        font-size: 0.85rem;
+        padding: 8px 10px;
+    }
+}

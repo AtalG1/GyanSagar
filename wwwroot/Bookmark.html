@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Bookmarks</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- Your Custom Bookmark CSS -->
+    <link rel="stylesheet" href="/css/Bookmark.css">
+    <div id="navbar-container"></div>
+    <script>
+
+        fetch('Navbar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+
+                // Handle logout after loading navbar
+                document.getElementById('logoutBtn')?.addEventListener('click', e => {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to logout?')) {
+                        localStorage.clear();
+                        window.location.href = 'login.html';
+                    }
+                });
+            });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('role');
+
+            // Redirect to login if not authenticated or not admin/staff
+            if (!token || !(role === 'user')) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</head>
+<body class="bg-light">
+
+    <div class="container my-5">
+        <h2 class="text-center mb-4">Your Bookmarks</h2>
+        <div id="bookmarkItems"></div>
+    </div>
+
+    <script>
+        const userId = localStorage.getItem('userId'); // Replace with actual logged-in user ID
+        const bookmarkContainer = document.getElementById('bookmarkItems');
+
+        fetch(`https://localhost:7003/api/Bookmark/view/${userId}`)
+            .then(res => res.json())
+            .then(items => {
+                if (!items || items.length === 0) {
+                    bookmarkContainer.innerHTML = '<p class="text-muted text-center">No bookmarks found.</p>';
+                    return;
+                }
+
+                items.forEach(item => {
+                    bookmarkContainer.innerHTML += `
+                        <div class="row align-items-center border p-3 mb-3 bookmark-item" id="bookmark-${item.bookID}">
+                            <div class="col-md-2">
+                                <img src="${item.imagePath || 'https://via.placeholder.com/50x75'}" class="img-fluid" alt="${item.title}" style="max-width: 50px; max-height: 75px;">
+                            </div>
+                            <div class="col-md-6">
+                                <h5>${item.title}</h5>
+                                <p class="mb-1"><strong>Author:</strong> ${item.author || 'Unknown'}</p>
+                                <p class="mb-1"><strong>Price:</strong> ₹ ${item.price}</p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <button class="btn btn-primary me-2" onclick="addToCart(${item.bookID})">Add to Cart</button>
+                                <button class="btn btn-danger" onclick="removeBookmark(${item.bookID})">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            })
+            .catch(err => {
+                console.error(err);
+                bookmarkContainer.innerHTML = '<p class="text-danger text-center">Failed to load bookmarks.</p>';
+            });
+
+        function addToCart(bookID) {
+            const data = { userID: userId, bookID: bookID };
+
+            fetch('https://localhost:7003/api/Cart/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to add to cart");
+                return res.text();
+            })
+            .then(msg => {
+                alert("Book added to cart.");
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Error adding to cart.");
+            });
+        }
+
+        function removeBookmark(bookID) {
+            fetch(`https://localhost:7003/api/Bookmark/delete/${bookID}?userId=${userId}`, {
+                method: 'DELETE'
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to delete bookmark");
+                return res.text();
+            })
+            .then(msg => {
+                document.getElementById(`bookmark-${bookID}`).remove();
+                alert("Bookmark deleted.");
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Error deleting bookmark.");
+            });
+        }
+    </script>
+
+</body>
+</html>

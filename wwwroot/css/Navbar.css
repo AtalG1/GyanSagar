@@ -1,0 +1,46 @@
+﻿body {
+    padding-top: 70px; /* Prevent content from being hidden behind fixed navbar */
+}
+
+.custom-navbar {
+    background: linear-gradient(90deg, #b3e5fc, #81d4fa, #4fc3f7);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    color: #003049;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1050;
+}
+
+    /* Navbar Brand */
+    .custom-navbar .navbar-brand {
+        font-weight: bold;
+        font-size: 1.5rem;
+        color: #003049;
+        text-transform: uppercase;
+        text-decoration: none;
+    }
+
+        /* Navbar Brand Icon */
+        .custom-navbar .navbar-brand i {
+            color: #0288d1;
+            font-size: 1.4rem;
+        }
+
+    /* Nav Links */
+    .custom-navbar .nav-link {
+        color: #003049;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+
+        /* Nav Link Hover */
+        .custom-navbar .nav-link:hover {
+            color: #01579b;
+        }
+
+/* Responsive Toggler */
+.navbar-toggler {
+    border: none;
+}

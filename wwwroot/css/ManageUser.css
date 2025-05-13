@@ -1,0 +1,26 @@
+﻿body {
+    background-color: #f8f9fa;
+}
+
+h2 {
+    color: #343a40;
+    font-weight: 600;
+}
+
+.table-responsive {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+select.form-select {
+    max-width: 140px;
+    margin: 0 auto;
+}
+
+.btn-primary {
+    transition: 0.3s;
+}
+
+    .btn-primary:hover {
+        background-color: #004080;
+    }

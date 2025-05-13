@@ -1,0 +1,388 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Books</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/AllBooks.css">
+    <div id="navbar-container"></div>
+
+    <style>
+        #banner {
+            background: linear-gradient(to right, #b30000, #cc0000);
+            color: #ffd700;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border: 3px solid #ffd700;
+            border-radius: 10px;
+            margin: 15px auto;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+            display: none;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .banner-icon {
+            margin-right: 10px;
+        }
+
+        @media (max-width: 600px) {
+            #banner {
+                font-size: 1rem;
+                padding: 15px;
+            }
+        }
+    </style>
+
+</head>
+
+<div id="banner"></div> <!-- Banner will appear here -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        fetch('https://localhost:7003/api/Banner/current')
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.message) {
+                    const bannerDiv = document.getElementById('banner');
+                    bannerDiv.innerHTML = `
+                         <span class="banner-icon">📢✨</span>
+                         ${data.message}
+                         <span class="banner-icon">✨</span>
+                     `;
+                    bannerDiv.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching banner:', error);
+            });
+    });
+</script>
+
+
+<body class="bg-light">
+
+    <div class="container my-5">
+        <h2 class="text-center mb-4">All Books</h2>
+
+        <!-- Search Bar and On Sale Checkbox -->
+        <div class="mb-4 d-flex justify-content-between align-items-center">
+            <input type="text" id="searchBar" class="form-control form-control-lg w-75" placeholder="Search by title, author, genre, etc.">
+            <div class="form-check form-switch ms-3">
+                <input class="form-check-input" type="checkbox" id="onSaleFilter">
+                <label class="form-check-label" for="onSaleFilter">Show Only On Sale</label>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Sidebar Filters -->
+            <div id="filterSection" class="col-md-3 d-none d-md-block filters">
+                <h5 class="mb-3">Filters</h5>
+                <div class="mb-3">
+                    <label for="genreFilter" class="form-label">Genre</label>
+                    <select id="genreFilter" class="form-select">
+                        <option value="">All Genres</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="languageFilter" class="form-label">Language</label>
+                    <select id="languageFilter" class="form-select">
+                        <option value="">All Languages</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="priceFilter" class="form-label">Price Range</label>
+                    <input type="range" class="form-range" id="priceFilter" min="0" max="2000" step="10">
+                    <p>₹<span id="priceValue">0</span> and Under</p>
+                </div>
+                <div class="mb-3">
+                    <label for="sortByPrice" class="form-label">Sort By Price</label>
+                    <select id="sortByPrice" class="form-select">
+                        <option value="low-to-high">Low to High</option>
+                        <option value="high-to-low">High to Low</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+
+            </div>
+
+            <!-- Books Grid -->
+            <div id="booksGrid" class="col-md-9">
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    <!-- Cards go here -->
+                </div>
+            </div>
+        </div>
+        <div id="pagination" class="d-flex justify-content-center mt-4"></div>
+    </div>
+    
+
+    
+
+            <script>
+                fetch('Navbar.html')
+                    .then(res => res.text())
+                    .then(html => {
+                        document.getElementById('navbar-container').innerHTML = html;
+
+                        // Handle logout after loading navbar
+                        document.getElementById('logoutBtn')?.addEventListener('click', e => {
+                            e.preventDefault();
+                            if (confirm('Are you sure you want to logout?')) {
+                                localStorage.clear();
+                                window.location.href = 'login.html';
+                            }
+                        });
+                    });
+
+            let currentPage = 1;
+            const pageSize = 12;
+            let totalCount = 0;
+
+            function applyFilters() {
+                const searchQuery = document.getElementById('searchBar').value;
+                const selectedGenre = document.getElementById('genreFilter').value;
+                const selectedLanguage = document.getElementById('languageFilter').value;
+                const selectedPrice = document.getElementById('priceFilter').value;
+                const sortByPrice = document.getElementById('sortByPrice').value;
+                const showOnlyOnSale = document.getElementById('onSaleFilter').checked;
+
+                const params = new URLSearchParams();
+                if (searchQuery) params.append('search', searchQuery);
+                if (selectedGenre) params.append('genre', selectedGenre);
+                if (selectedLanguage) params.append('language', selectedLanguage);
+                if (selectedPrice) params.append('maxPrice', selectedPrice);
+                if (showOnlyOnSale) params.append('onSale', true);
+                if (sortByPrice) params.append('sortBy', sortByPrice);
+                params.append('page', currentPage);
+                params.append('pageSize', pageSize);
+
+                fetch(`https://localhost:7003/api/books/all-details?${params.toString()}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        totalCount = data.totalCount;
+                        renderBooks(data.books);
+                        renderPagination();
+                        populateFilterOptions(data.books);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        document.getElementById('booksGrid').innerHTML = '<p class="text-danger">Failed to load books.</p>';
+                    });
+            }
+
+            function renderPagination() {
+                const pagination = document.getElementById('pagination');
+                pagination.innerHTML = '';
+                const totalPages = Math.ceil(totalCount / pageSize);
+                if (totalPages <= 1) return;
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn btn-sm mx-1 ' + (i === currentPage ? 'btn-primary' : 'btn-outline-primary');
+                    btn.innerText = i;
+                    btn.addEventListener('click', () => {
+                        currentPage = i;
+                        applyFilters();
+                    });
+                    pagination.appendChild(btn);
+                }
+            }
+
+            function populateFilterOptions(books) {
+                const genreSelect = document.getElementById('genreFilter');
+                const languageSelect = document.getElementById('languageFilter');
+
+                const genres = [...new Set(books.map(b => b.genre).filter(Boolean))];
+                const languages = [...new Set(books.map(b => b.language).filter(Boolean))];
+
+                genreSelect.innerHTML = '<option value="">All Genres</option>';
+                genres.forEach(g => {
+                    genreSelect.innerHTML += `<option value="${g}">${g}</option>`;
+                });
+
+                languageSelect.innerHTML = '<option value="">All Languages</option>';
+                languages.forEach(l => {
+                    languageSelect.innerHTML += `<option value="${l}">${l}</option>`;
+                });
+            }
+
+            function renderBooks(books) {
+                const grid = document.getElementById('booksGrid').querySelector('.row');
+                grid.innerHTML = '';
+
+                if (!books || books.length === 0) {
+                    grid.innerHTML = '<p class="text-muted">No books found.</p>';
+                    return;
+                }
+
+                books.forEach(book => {
+                    grid.innerHTML += `
+                        <div class="col">
+                        <a href="Book.html?id=${book.bookID}" class="card-link text-decoration-none">
+                            <div class="card h-100 book-card shadow-lg">
+                                <img src="${book.imagePath || 'https://via.placeholder.com/200x300'}" class="card-img-top" alt="Book Cover">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">${book.title}</h5>
+                                    <p class="card-text author"><strong>Author:</strong> ${book.author}</p>
+                                    <p class="card-text genre"><strong>Genre:</strong> ${book.genre}</p>
+                                    <p class="card-text language"><strong>Language:</strong> ${book.language}</p>
+
+                                    <div class="price-section mt-auto">
+                                        ${book.isOnSale ? `
+                                            <p class="original-price">₹${book.price}</p>
+                                            <p class="discounted-price">₹${(book.price * (1 - book.saleDiscount / 100)).toFixed(2)}</p>
+                                            <p class="sale-ribbon">🔥 ${book.saleDiscount}% OFF!</p>
+                                        ` : `
+                                            <p class="original-price invisible">.</p>
+                                            <p class="discounted-price">₹${book.price}</p>
+                                        `}
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <button class="btn btn-outline-primary add-to-cart" data-book-id="${book.bookID}">
+                                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                                        </button>
+
+                                        <button class="btn btn-outline-secondary add-to-bookmark"  data-book-id="${book.bookID}">
+                                            <i class="fas fa-bookmark"></i> Bookmark
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        </div>
+                    `;
+                });
+            }
+
+            // Filter bindings
+            document.getElementById('searchBar').addEventListener('input', () => {
+                currentPage = 1;
+                applyFilters();
+            });
+            document.getElementById('onSaleFilter').addEventListener('change', () => {
+                currentPage = 1;
+                applyFilters();
+            });
+            //document.getElementById('genreFilter').addEventListener('change', () => {
+            //    currentPage = 1;
+            //    applyFilters();
+            //});
+            //document.getElementById('languageFilter').addEventListener('change', () => {
+            //    currentPage = 1;
+            //    applyFilters();
+            //});
+            //document.getElementById('priceFilter').addEventListener('input', function () {
+            //    document.getElementById('priceValue').textContent = this.value;
+            //    currentPage = 1;
+            //    applyFilters();
+            //});
+            //document.getElementById('sortByPrice').addEventListener('change', () => {
+            //    currentPage = 1;
+            //    applyFilters();
+                //});
+
+                document.getElementById('priceFilter').addEventListener('input', function () {
+                    document.getElementById('priceValue').textContent = this.value;
+                });
+
+            function resetFilters() {
+                document.getElementById('searchBar').value = '';
+                document.getElementById('onSaleFilter').checked = false;
+                document.getElementById('genreFilter').value = '';
+                document.getElementById('languageFilter').value = '';
+                document.getElementById('priceFilter').value = 2000;
+                document.getElementById('priceValue').textContent = '2000';
+                document.getElementById('sortByPrice').value = 'low-to-high';
+                currentPage = 1;
+                applyFilters();
+            }
+
+            // Add to Cart
+                document.addEventListener('click', function (e) {
+                    if (e.target.closest('.add-to-cart')) {
+                        const bookId = e.target.closest('.add-to-cart').getAttribute('data-book-id');
+                        const userId = localStorage.getItem('userId'); // Replace with actual user ID
+
+                        if (!userId) {
+                            alert("⚠️ Please log in to add items to your cart.");
+                            return;
+                        }
+
+                        fetch('https://localhost:7003/api/cart/add', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ userID: userId, bookID: bookId })
+                        })
+                            .then(res => {
+                                if (res.ok) {
+                                    // Successfully added to cart, now extract response text
+                                    return res.text();
+                                } else {
+                                    // If response is not ok (non-2xx status), throw error
+                                    throw new Error('Failed to add item to cart');
+                                }
+                            })
+                            .then(msg => {
+                                alert("✅ " + msg); // Show success message
+                            })
+                            .catch(error => {
+                                console.error('Error:', error); // Log error to console for debugging
+                                alert(" Added item to cart."); // Show error alert
+                            });
+                    }
+                });
+
+
+
+            // Add to Bookmark
+            document.addEventListener('click', function (e) {
+                if (e.target.closest('.add-to-bookmark')) {
+                    const bookId = e.target.closest('.add-to-bookmark').getAttribute('data-book-id');
+                    const userId = localStorage.getItem('userId');
+
+                    if (!userId) {
+                        alert("⚠️ Please log in to add items to your Bookmark.");
+                        return;
+                    }
+
+                    fetch('https://localhost:7003/api/Bookmark/add', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userID: userId, bookID: bookId })
+                    })
+                        .then(res => res.text())
+                        .then(msg => alert("✅ Item added to Bookmark." + msg))
+                        .catch(() => alert("❌ Item already added to Bookmark."));
+                }
+            });
+
+            // Initial load
+            document.addEventListener('DOMContentLoaded', () => {
+                applyFilters(); // load page 1 on load
+            });
+    </script>
+
+</body>
+</html>

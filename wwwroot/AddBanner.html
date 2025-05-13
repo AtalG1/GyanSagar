@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Manage Banner</title>
+    <link rel="stylesheet" href="/css/AddBanner.css">
+    <div id="navbar-container"></div>
+    <script>
+
+        fetch('NavbarAdmin.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+
+                // Handle logout after loading navbar
+                document.getElementById('logoutBtn')?.addEventListener('click', e => {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to logout?')) {
+                        localStorage.clear();
+                        window.location.href = 'login.html';
+                    }
+                });
+            });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('role');
+
+            // Redirect to login if not authenticated or not admin/staff
+            if (!token || !(role === 'admin' || role === 'staff')) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</head>
+<body>
+
+    <h2>Manage Banner</h2>
+
+    <form id="bannerForm">
+        <label for="message">Banner Message:</label><br>
+        <textarea id="message" name="message" rows="4" cols="50" required></textarea><br><br>
+
+        <label for="startDate">Start Date:</label><br>
+        <input type="datetime-local" id="startDate" name="startDate" required><br><br>
+
+        <label for="endDate">End Date:</label><br>
+        <input type="datetime-local" id="endDate" name="endDate" required><br><br>
+
+        <label for="isActive">Is Active:</label>
+        <input type="checkbox" id="isActive" name="isActive"><br><br>
+
+        <!-- Create Banner Button -->
+        <button class="button" type="submit">Create/Update Banner</button>
+        <button class="button delete-button" id="deleteButton">Delete Active Banner</button>
+    </form>
+
+    
+    
+
+    <script>
+        const form = document.getElementById('bannerForm');
+        const deleteButton = document.getElementById('deleteButton');
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+
+            const bannerData = {
+                message: formData.get('message'),
+                startDate: formData.get('startDate'),
+                endDate: formData.get('endDate'),
+                isActive: formData.get('isActive') === 'on'
+            };
+
+            // First, delete the previous banner
+            fetch('https://localhost:7003/api/Banner/delete', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())  // Process the delete response
+                .then(() => {
+                    // Once the old banner is deleted, create the new one
+                    return fetch('https://localhost:7003/api/Banner/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(bannerData)
+                    });
+                })
+                .then(response => response.json())  // Process the response from creating the new banner
+                .then(data => {
+                    alert('Banner created successfully!');
+                    window.location.href = '/Adminbook.html';  // Redirect to your desired page
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error creating banner: ' + error.message);
+                });
+        });
+
+        // Delete Banner Functionality
+        deleteButton.addEventListener('click', () => {
+            if (confirm('Are you sure you want to delete the current active banner?')) {
+                fetch('https://localhost:7003/api/Banner/delete', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to delete the banner.');
+                        }
+                        alert('Banner deleted successfully!');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error deleting banner: ' + error.message);
+                    });
+            }
+        });
+    </script>
+
+</body>
+</html>

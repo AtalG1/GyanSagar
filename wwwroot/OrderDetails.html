@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Details</title>
+    <link rel="stylesheet" href="/css/OrderDetails.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <div id="navbar-container"></div>
+    <script>
+        fetch('/Navbar.html')
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById('navbar-container').innerHTML = data;
+            });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Order Details</h1>
+        <div id="order-info" class="order-info"></div>
+        <h2>Books in this order</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id="booksTableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('orderId');
+
+        fetch(`https://localhost:7003/api/Order/details/${orderId}`)
+            .then(res => res.json())
+            .then(order => {
+                document.getElementById('order-info').innerHTML = `
+                        <p><strong>Order ID:</strong> ${order.orderID}</p>
+                        <p><strong>Order Date:</strong> ${new Date(order.orderDate).toLocaleDateString()}</p>
+                        <p><strong>Total Amount:</strong> ₹${order.totalAmount.toFixed(2)}</p>
+                        <p><strong>Discount:</strong> ₹${order.discountAmount.toFixed(2)}</p>
+                        <p><strong>Final Amount:</strong> ₹${order.finalAmount.toFixed(2)}</p>
+                        <p><strong>Status:</strong> ${order.status}</p>
+                        <p><strong>Verification Code:</strong> ${order.verificationCode}</p>
+                    `;
+
+                const tbody = document.getElementById("booksTableBody");
+                order.books.forEach(book => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                            <td>${book.title}</td>
+                            <td>${book.author}</td>
+                            <td>₹${book.price.toFixed(2)}</td>
+                            <td>${book.quantity}</td>
+                            <td>₹${(book.price * book.quantity).toFixed(2)}</td>
+                        `;
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(err => {
+                console.error("Error loading order details:", err);
+                alert("Could not load order details.");
+            });
+    </script>
+</body>
+</html>

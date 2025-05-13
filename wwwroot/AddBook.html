@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Book</title>
+    <link rel="stylesheet" href="/css/AddBook.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <div id="navbar-container"></div>
+
+    <script>
+        fetch('/NavbarAdmin.html')
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById('navbar-container').innerHTML = data;
+            });
+    </script>
+
+    <!-- Form Container -->
+    <div class="form-container">
+        <h2>Add a New Book</h2>
+        <form id="addBookForm" enctype="multipart/form-data" method="post" action="https://localhost:7003/api/Books/add">
+
+            <div class="row">
+                <div class="col">
+                    <label>Title</label>
+                    <input type="text" name="Title" required>
+                </div>
+                <div class="col">
+                    <label>Author</label>
+                    <input type="text" name="Author" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label>Genre</label>
+                    <input type="text" name="Genre" required>
+                </div>
+                <div class="col">
+                    <label>ISBN</label>
+                    <input type="text" name="ISBN" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label>Price</label>
+                    <input type="number" name="Price" step="0.01" required>
+                </div>
+                <div class="col">
+                    <label>Stock Availability</label>
+                    <input type="number" name="StockAvailability" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label>Language</label>
+                    <input type="text" name="Language" required>
+                </div>
+                <div class="col">
+                    <label>Format</label>
+                    <select name="Format" required>
+                        <option value="Paperback">Paperback</option>
+                        <option value="Hardcopy">Hardcopy</option>
+                    </select>
+                </div>
+            </div>
+
+            <label>Publisher</label>
+            <input type="text" name="Publisher" required>
+
+            <label>Book Cover Image</label>
+            <input type="file" name="BookImage" accept="image/*">
+
+            <button type="submit">Add Book</button>
+        </form>
+    </div>
+</body>
+</html>

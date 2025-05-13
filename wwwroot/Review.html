@@ -1,0 +1,162 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rate & Review</title>
+    <link rel="stylesheet" href="/css/Review.css">
+    <div id="navbar-container"></div>
+    <script>
+
+        fetch('Navbar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+
+                // Handle logout after loading navbar
+                document.getElementById('logoutBtn')?.addEventListener('click', e => {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to logout?')) {
+                        localStorage.clear();
+                        window.location.href = 'login.html';
+                    }
+                });
+            });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('role');
+
+            // Redirect to login if not authenticated or not admin/staff
+            if (!token || !(role === 'user')) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="review-container">
+        <h2>Rate & Review</h2>
+        <div class="book-info" id="bookInfo"></div>
+
+        <form id="reviewForm">
+            <label for="rating">Your Rating:</label>
+            <div class="stars" id="starRating"></div>
+
+            <label for="reviewText">Your Review:</label>
+            <textarea id="reviewText" name="reviewText" rows="5" placeholder="Write your review here..." required></textarea>
+
+            <button type="submit">Submit Review</button>
+        </form>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookId = urlParams.get('bookId');
+        const userId = localStorage.getItem('userId'); // Replace with actual logged-in user ID
+        const fullname = localStorage.getItem('userEmail');
+        let selectedRating = 0;
+
+        const bookInfo = document.getElementById('bookInfo');
+        const starContainer = document.getElementById('starRating');
+        const reviewTextArea = document.getElementById('reviewText');
+
+        // Load book details
+        fetch(`https://localhost:7003/api/Books/${bookId}`)
+            .then(res => res.json())
+            .then(book => {
+                bookInfo.innerHTML = `
+                        <img src="${book.ImagePath}" alt="${book.Title}" style="max-height: 150px;">
+                        <div>
+                            <h3>${book.Title}</h3>
+                            <p>by ${book.Author}</p>
+                        </div>
+                    `;
+            });
+
+        // Render stars
+        for (let i = 1; i <= 5; i++) {
+            const star = document.createElement('span');
+            star.innerHTML = '★';
+            star.classList.add('star');
+            star.dataset.value = i;
+            star.onclick = () => {
+                selectedRating = i;
+                updateStars(i);
+            };
+            starContainer.appendChild(star);
+        }
+
+        function updateStars(rating) {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                star.classList.toggle('selected', index < rating);
+            });
+        }
+
+        // Load existing review (if any)
+        fetch(`https://localhost:7003/api/Review/user/${userId}/book/${bookId}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+                if (data) {
+                    selectedRating = data.rating;
+                    updateStars(selectedRating);
+                    reviewTextArea.value = data.reviewText;
+                }
+            });
+
+        document.getElementById('reviewForm').addEventListener('submit', async e => {
+            e.preventDefault();
+            console.log("Submit button clicked");
+
+            if (selectedRating === 0) {
+                alert("Please select a rating.");
+                return;
+            }
+
+            const username = localStorage.getItem('username');
+            const reviewData = {
+                userId: userId,
+                bookId: bookId,
+                rating: selectedRating,
+                review: reviewTextArea.value,
+                fullname: username
+            };
+
+            console.log("Review data to be submitted:", reviewData);
+
+            try {
+                const res = await fetch('https://localhost:7003/api/Review/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reviewData)
+                });
+
+                const contentType = res.headers.get("content-type");
+                if (!contentType || !contentType.includes("application/json")) {
+                    const text = await res.text();
+                    console.error("Done", text);
+                    alert("Done  " + text);
+                    return;
+                }
+
+                const result = await res.json();
+                console.log("Server response:", result);
+
+                if (res.ok && result.success) {
+                    alert("Thank you for your review!");
+                    window.location.href = "/purchases.html";
+                } else {
+                    alert("Error submitting review: " + (result.message || "Unknown error"));
+                }
+            } catch (error) {
+                console.error("Fetch error:", error);
+                alert("Fetch error: " + error.message);
+            }
+        });
+
+
+
+
+    </script>
+</body>
+</html>

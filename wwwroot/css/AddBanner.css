@@ -1,0 +1,86 @@
+﻿:root {
+    --primary-color: #b02a37;
+    --accent-color: #ffcc00;
+    --bg-color: #f5f7fa;
+    --text-color: #333;
+    --input-border: #ccc;
+    --focus-border: #b02a37;
+    --button-hover: #a0252f;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+    padding: 40px;
+    color: var(--text-color);
+}
+
+h2 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 30px;
+}
+
+form {
+    background-color: #fff;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    font-weight: 600;
+    display: block;
+    margin: 12px 0 6px;
+}
+
+textarea,
+input[type="datetime-local"],
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--input-border);
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+    textarea:focus,
+    input[type="datetime-local"]:focus,
+    input[type="text"]:focus {
+        border-color: var(--focus-border);
+        outline: none;
+    }
+
+input[type="checkbox"] {
+    transform: scale(1.2);
+    margin-top: 8px;
+}
+
+.button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    position: center;
+}
+
+    .button:hover {
+        background-color: #45a049;
+    }
+
+.delete-button {
+    background-color: #f44336; /* Red color for delete */
+
+}
+
+    .delete-button:hover {
+        background-color: #e53935;
+    }

@@ -1,0 +1,144 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Orders</title>
+    <link rel="stylesheet" href="/css/Order.css">
+
+    <div id="navbar-container"></div>
+    <script>
+
+        fetch('Navbar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('navbar-container').innerHTML = html;
+
+                // Handle logout after loading navbar
+                document.getElementById('logoutBtn')?.addEventListener('click', e => {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to logout?')) {
+                        localStorage.clear();
+                        window.location.href = 'login.html';
+                    }
+                });
+            });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('role');
+
+            // Redirect to login if not authenticated or not admin/staff
+            if (!token || !(role === 'user')) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+
+</head>
+<body>
+    <h1>Your Orders</h1>
+
+    <div class="order-container">
+        <table id="ordersTable">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Order Date</th>
+                    <th>Total Amount</th>
+                    <th>Discount</th>
+                    <th>Final Amount</th>
+                    <th>Verification Code</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Orders will be dynamically inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="order-summary">
+        <p id="totalAmount"></p>
+        <p id="finalAmount"></p>
+    </div>
+
+    <script>
+        const userId = localStorage.getItem('userId'); // Replace with actual logged-in user ID
+
+        fetch(`https://localhost:7003/api/Order/orders/${userId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(orders => {
+                if (orders.length === 0) {
+                    document.querySelector('.order-container').innerHTML = '<p>No orders found.</p>';
+                    return;
+                }
+
+                const tableBody = document.querySelector('#ordersTable tbody');
+                let totalAmount = 0;
+                let finalAmount = 0;
+
+                orders.forEach(order => {
+                    const row = document.createElement('tr');
+
+                    row.style.cursor = "pointer";
+                    row.onclick = () => {
+                        window.location.href = `/OrderDetails.html?orderId=${order.orderID}`;
+                    };
+
+                    const cancelButton = order.status.toLowerCase() === "pending"
+                        ? `<button class="btn btn-danger" onclick="cancelOrder(${order.orderID})">Cancel</button>`
+                        : '';
+
+                    row.innerHTML = `
+                        <td>${order.orderID}</td>
+                        <td>${new Date(order.orderDate).toLocaleDateString()}</td>
+                        <td>₹${order.totalAmount.toFixed(2)}</td>
+                        <td>₹${order.discountAmount.toFixed(2)}</td>
+                        <td>₹${order.finalAmount.toFixed(2)}</td>
+                        <td>${order.verificationCode}</td>
+                        <td>${order.status}</td>
+                        <td>${cancelButton}</td>
+                    `;
+
+                    tableBody.appendChild(row);
+
+                   
+                });
+
+               
+            })
+            .catch(error => {
+                console.error('Error fetching orders:', error);
+                
+            });
+
+
+        function cancelOrder(orderId) {
+            if (!confirm("Are you sure you want to cancel this order?")) return;
+
+            fetch(`https://localhost:7003/api/Order/cancel/${orderId}`, {
+                method: 'POST'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to cancel order.');
+                    }
+                    alert('Order cancelled successfully!');
+                    location.reload(); // Refresh the list
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error cancelling order.');
+                });
+        }
+
+    </script>
+</body>
+</html>
